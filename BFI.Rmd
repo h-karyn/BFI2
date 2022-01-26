@@ -1,0 +1,161 @@
+---
+title: "BFI"
+author: "Karyn Huang"
+date: "1/25/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r message = FALSE }
+library(psych)
+library(lavaan)
+library(semTools)
+```
+## Processing the data 
+```{r}
+# select variables relevant to this study
+load("/Users/mhhuang/OneDrive - UBC/BFI Study/Analysis/bfi.cleaned.data.participant.v1.RData")
+data <- bfi.cleaned.data.participant.v1[,c(1:61,122:129)]
+
+# filter data basing on condition 
+likert_data <- subset(data, data$self_condition == "O") #“O” refers to the Original Likert version
+expanded_data <- subset(data, data$self_condition == "E") #“E” refers to the Expanded version 
+```
+
+
+## Building the Models
+
+### Extroversion 
+#### Constructing the Models 
+Model 0 has no method factor.
+```{r}
+Model0_E <- '
+Sociability  =~ self_BFI_1 + self_BFI_16 + self_BFI_31 + self_BFI_46
+Assertiveness  =~ self_BFI_6 + self_BFI_21 + self_BFI_36 + self_BFI_51
+Energy_Level  =~ self_BFI_11 + self_BFI_26 + self_BFI_41 + self_BFI_56
+
+#Extroversion =~ Sociability + Assertiveness + Energy_Level
+'
+```
+Model 1 has an Acquiescence factor capturing the residuals variance of all items. 
+```{r}
+Model1_E <- '
+Sociability  =~ self_BFI_1 + self_BFI_16 + self_BFI_31 + self_BFI_46
+Assertiveness  =~ self_BFI_6 + self_BFI_21 + self_BFI_36 + self_BFI_51
+Energy_Level  =~ self_BFI_11 + self_BFI_26 + self_BFI_41 + self_BFI_56
+
+#Extroversion =~ Sociability + Assertiveness + Energy_Level
+
+Sociability ~~ 0*Acquiescence
+Energy_Level ~~ 0*Acquiescence
+Assertiveness ~~ 0*Acquiescence
+
+Acquiescence =~ 1*self_BFI_1 + (-1)*self_BFI_16 + (-1)*self_BFI_31 + 1*self_BFI_46 + 
+1*self_BFI_6 + 1*self_BFI_21 + (-1)*self_BFI_36 + (-1)*self_BFI_51 + 
+(-1)*self_BFI_11 + (-1)*self_BFI_26 + 1*self_BFI_41 + 1*self_BFI_56
+'
+```
+Model 2 has a negative wording factor. 
+```{r}
+Model2_E <- '
+Sociability  =~ self_BFI_1 + self_BFI_16 + self_BFI_31 + self_BFI_46
+Assertiveness  =~ self_BFI_6 + self_BFI_21 + self_BFI_36 + self_BFI_51
+Energy_Level  =~ self_BFI_11 + self_BFI_26 + self_BFI_41 + self_BFI_56
+
+#Extroversion =~ Sociability + Assertiveness + Energy_Level
+
+Sociability ~~ 0*Reverse
+Energy_Level ~~ 0*Reverse
+Assertiveness ~~ 0*Reverse
+
+Reverse =~ self_BFI_16 + self_BFI_31 + self_BFI_36 + self_BFI_51 + self_BFI_11 + self_BFI_26 
+'
+```
+Model 3 has a positive wording factor.
+```{r}
+Model3_E <- '
+Sociability  =~ self_BFI_1 + self_BFI_16 + self_BFI_31 + self_BFI_46
+Assertiveness  =~ self_BFI_6 + self_BFI_21 + self_BFI_36 + self_BFI_51
+Energy_Level  =~ self_BFI_11 + self_BFI_26 + self_BFI_41 + self_BFI_56
+
+#Extroversion =~ Sociability + Assertiveness + Energy_Level
+
+Sociability ~~ 0*Positive
+Energy_Level ~~ 0*Positive
+Assertiveness ~~ 0*Positive
+
+Positive =~ self_BFI_1 + self_BFI_46 + self_BFI_6 + self_BFI_21 + self_BFI_41 + self_BFI_56
+'
+
+# The Expanded data do not fit Model 3. To converge the mode, we restricted the residual 
+# of item 56 to positive 
+Model3_E_alternative <- '
+Sociability  =~ self_BFI_1 + self_BFI_16 + self_BFI_31 + self_BFI_46
+Assertiveness  =~ self_BFI_6 + self_BFI_21 + self_BFI_36 + self_BFI_51
+Energy_Level  =~ self_BFI_11 + self_BFI_26 + self_BFI_41 + self_BFI_56
+
+#Extroversion =~ Sociability + Assertiveness + Energy_Level
+
+Sociability ~~ 0*Positive
+Energy_Level ~~ 0*Positive
+Assertiveness ~~ 0*Positive
+
+self_BFI_56~~ a* self_BFI_56
+a>0
+
+Positive =~ self_BFI_1 + self_BFI_46 + self_BFI_6 + self_BFI_21 + self_BFI_41 + self_BFI_56
+'
+```
+
+
+```{r}
+Run_Model0_Likert_E <- sem(Model0_E,dat = likert_data, missing = "ML")
+Run_Model1_Likert_E <- sem(Model1_E,dat = likert_data, missing = "ML")
+Run_Model2_Likert_E <- sem(Model2_E,dat = likert_data,missing = "ML")
+Run_Model3_Likert_E <- sem(Model3_E,dat = likert_data,missing = "ML")
+
+Run_Model0_Expanded_E <- sem(Model0_E,dat = expanded_data, missing = "ML")
+Run_Model1_Expanded_E <- sem(Model1_E,dat = expanded_data, missing = "ML")
+Run_Model2_Expanded_E <- sem(Model2_E,dat = expanded_data, missing = "ML")
+Run_Model3_Expanded_E <- sem(Model3_E_alternative,dat = expanded_data, missing = "ML") # the modified Model 3
+```
+
+
+#### Descriptive Statistics for Model 0  
+```{r}
+reliability(Run_Model0_Likert_E,return.total=TRUE)
+reliability(Run_Model0_Expanded_E,return.total=TRUE)
+
+# For this run, it is 0.9094558. (Last column, second row). 
+```
+
+
+```{r}
+summary(Run_Model0_Likert_E, standardized = TRUE,fit.measures = TRUE)
+summary(Run_Model1_Likert_E,standardized = TRUE,fit.measures = TRUE)
+summary(Run_Model2_Likert_E,standardized = TRUE,fit.measures = TRUE)
+summary(Run_Model3_Likert_E,standardized = TRUE,fit.measures = TRUE)
+```
+
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
+
+
