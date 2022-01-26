@@ -136,8 +136,14 @@ reliability(Run_Model0_Expanded_E,return.total=TRUE)
 
 ```{r}
 summary(Run_Model0_Likert_E, standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
 summary(Run_Model1_Likert_E,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
 summary(Run_Model2_Likert_E,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
 summary(Run_Model3_Likert_E,standardized = TRUE,fit.measures = TRUE)
 ```
 
