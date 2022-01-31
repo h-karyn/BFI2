@@ -30,7 +30,7 @@ expanded_data <- subset(data, data$self_condition == "E") #“E” refers to the
 ## Building the Models
 
 ### Extroversion 
-#### Constructing the Models 
+#### Model Syntax
 Model 0 has no method factor.
 ```{r}
 Model0_E <- '
@@ -41,7 +41,7 @@ Energy_Level  =~ self_BFI_11 + self_BFI_26 + self_BFI_41 + self_BFI_56
 #Extroversion =~ Sociability + Assertiveness + Energy_Level
 '
 ```
-Model 1 has an Acquiescence factor capturing the residuals variance of all items. 
+Model 1 has an Acquiescence factor to capture the residuals variance of all items. 
 ```{r}
 Model1_E <- '
 Sociability  =~ self_BFI_1 + self_BFI_16 + self_BFI_31 + self_BFI_46
@@ -59,7 +59,7 @@ Acquiescence =~ 1*self_BFI_1 + (-1)*self_BFI_16 + (-1)*self_BFI_31 + 1*self_BFI_
 (-1)*self_BFI_11 + (-1)*self_BFI_26 + 1*self_BFI_41 + 1*self_BFI_56
 '
 ```
-Model 2 has a negative wording factor. 
+Model 2 has a negative wording factor to capture the residuals variance of reversely worded items.
 ```{r}
 Model2_E <- '
 Sociability  =~ self_BFI_1 + self_BFI_16 + self_BFI_31 + self_BFI_46
@@ -75,7 +75,7 @@ Assertiveness ~~ 0*Reverse
 Reverse =~ self_BFI_16 + self_BFI_31 + self_BFI_36 + self_BFI_51 + self_BFI_11 + self_BFI_26 
 '
 ```
-Model 3 has a positive wording factor.
+Model 3 has a positive wording factor to capture the residuals variance of positively worded items. The alternatice syntax is used for the Expanded format to constrain the variance to be positive
 ```{r}
 Model3_E <- '
 Sociability  =~ self_BFI_1 + self_BFI_16 + self_BFI_31 + self_BFI_46
@@ -110,8 +110,7 @@ a>0
 Positive =~ self_BFI_1 + self_BFI_46 + self_BFI_6 + self_BFI_21 + self_BFI_41 + self_BFI_56
 '
 ```
-
-
+#### Constructing the Models 
 ```{r}
 Run_Model0_Likert_E <- sem(Model0_E,dat = likert_data, missing = "ML")
 Run_Model1_Likert_E <- sem(Model1_E,dat = likert_data, missing = "ML")
@@ -124,16 +123,25 @@ Run_Model2_Expanded_E <- sem(Model2_E,dat = expanded_data, missing = "ML")
 Run_Model3_Expanded_E <- sem(Model3_E_alternative,dat = expanded_data, missing = "ML") # the modified Model 3
 ```
 
-
 #### Descriptive Statistics for Model 0  
+To obtain the coefficient omega
 ```{r}
 reliability(Run_Model0_Likert_E,return.total=TRUE)
 reliability(Run_Model0_Expanded_E,return.total=TRUE)
-
-# For this run, it is 0.9094558. (Last column, second row). 
+```
+To obtain the average item mean
+```{r}
+mean(colMeans(likert_data[,c(1 , 16 , 31 , 46, 6 , 21 , 36 , 51, 11 , 26 , 41 , 56)],na.rm=TRUE))
+mean(colMeans(expanded_data[,c(1 , 16 , 31 , 46, 6 , 21 , 36 , 51, 11 , 26 , 41 , 56)],na.rm=TRUE))
+```
+To obtain the average item variance
+```{r}
+mean(sapply(likert_data[,c(1 , 16 , 31 , 46, 6 , 21 , 36 , 51, 11 , 26 , 41 , 56)], var, na.rm=TRUE))
+mean(sapply(expanded_data[,c(1 , 16 , 31 , 46, 6 , 21 , 36 , 51, 11 , 26 , 41 , 56)], var, na.rm=TRUE))
 ```
 
-
+#### Model Summary
+##### Likert Format
 ```{r}
 summary(Run_Model0_Likert_E, standardized = TRUE,fit.measures = TRUE)
 ```
@@ -146,16 +154,28 @@ summary(Run_Model2_Likert_E,standardized = TRUE,fit.measures = TRUE)
 ```{r}
 summary(Run_Model3_Likert_E,standardized = TRUE,fit.measures = TRUE)
 ```
-
-
+##### Expanded Format
 ```{r}
+summary(Run_Model0_Expanded_E, standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model1_Expanded_E,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model2_Expanded_E,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model3_Expanded_E,standardized = TRUE,fit.measures = TRUE)
+```
 
+#### Model Fit indices 
+```{r}
+summary(compareFit(Run_Model0_Likert_E,Run_Model1_Likert_E,Run_Model2_Likert_E,Run_Model3_Likert_E,nested = FALSE))
 ```
 
 
-
 ```{r}
-
+summary(compareFit(Run_Model0_Expanded_E,Run_Model1_Expanded_E,Run_Model2_Expanded_E,Run_Model3_Expanded_E,nested = FALSE))
 ```
 
 
