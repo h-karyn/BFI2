@@ -173,15 +173,99 @@ summary(Run_Model3_Expanded_E,standardized = TRUE,fit.measures = TRUE)
 summary(compareFit(Run_Model0_Likert_E,Run_Model1_Likert_E,Run_Model2_Likert_E,Run_Model3_Likert_E,nested = FALSE))
 ```
 
-
 ```{r}
 summary(compareFit(Run_Model0_Expanded_E,Run_Model1_Expanded_E,Run_Model2_Expanded_E,Run_Model3_Expanded_E,nested = FALSE))
 ```
 
 
+### Agreeableness
+#### Model Syntax
+Model 0 has no method factor.
 
 ```{r}
+Model0_A <- '
+Compassion  =~ self_BFI_2 + self_BFI_17 + self_BFI_32 + self_BFI_47
+Respectfulness  =~ self_BFI_7 + self_BFI_22 + self_BFI_37 + self_BFI_52
+Trust  =~ self_BFI_12 + self_BFI_27 + self_BFI_42 + self_BFI_57
 
+#Agreeableness =~ Compassion + Respectfulness + Trust
+'
+```
+Model 1 has an Acquiescence factor to capture the residuals variance of all items. 
+```{r}
+Model1_A <- '
+Compassion  =~ self_BFI_2 + self_BFI_17 + self_BFI_32 + self_BFI_47
+Respectfulness  =~ self_BFI_7 + self_BFI_22 + self_BFI_37 + self_BFI_52
+Trust  =~ self_BFI_12 + self_BFI_27 + self_BFI_42 + self_BFI_57
+
+#Agreeableness =~ Compassion + Respectfulness + Trust
+
+Compassion ~~ 0*Acquiescence
+Respectfulness ~~ 0*Acquiescence
+Trust ~~ 0*Acquiescence
+
+Acquiescence =~ 1*self_BFI_2 + (-1)*self_BFI_17 + 1*self_BFI_32 + (-1)*self_BFI_47 + 
+1*self_BFI_7 + (-1)*self_BFI_22 + (-1)*self_BFI_37 + 1*self_BFI_52 + 
+(-1)*self_BFI_12 + 1*self_BFI_27 + (-1)*self_BFI_42 + 1*self_BFI_57
+'
+```
+Model 2 has a negative wording factor to capture the residuals variance of reversely worded items.
+```{r}
+Model2_A <- '
+Compassion  =~ self_BFI_2 + self_BFI_17 + self_BFI_32 + self_BFI_47
+Respectfulness  =~ self_BFI_7 + self_BFI_22 + self_BFI_37 + self_BFI_52
+Trust  =~ self_BFI_12 + self_BFI_27 + self_BFI_42 + self_BFI_57
+
+#Agreeableness =~ Compassion + Respectfulness + Trust
+
+Compassion ~~ 0*Reverse
+Respectfulness ~~ 0*Reverse
+Trust ~~ 0*Reverse
+
+Reverse =~ self_BFI_17 + self_BFI_47 + self_BFI_22 + self_BFI_37 + self_BFI_12 + self_BFI_42
+'
+```
+Model 3 has a positive wording factor to capture the residuals variance of positively worded items. The alternatice syntax is used for the Expanded format to constrain the variance to be positive
+```{r}
+Model3_A <- '
+Compassion  =~ self_BFI_2 + self_BFI_17 + self_BFI_32 + self_BFI_47
+Respectfulness  =~ self_BFI_7 + self_BFI_22 + self_BFI_37 + self_BFI_52
+Trust  =~ self_BFI_12 + self_BFI_27 + self_BFI_42 + self_BFI_57
+
+#Agreeableness =~ Compassion + Respectfulness + Trust
+
+Compassion ~~ 0*Positive
+Respectfulness ~~ 0*Positive
+Trust ~~ 0*Positive
+
+Positive =~ self_BFI_2 + self_BFI_32 + self_BFI_7 + self_BFI_52 + self_BFI_27 + self_BFI_57
+'
+```
+#### Constructing the Models 
+```{r}
+Run_Model0_Likert_A <- sem(Model0_A,dat = likert_data, missing = "ML")
+Run_Model1_Likert_A <- sem(Model1_A,dat = likert_data, missing = "ML")
+Run_Model2_Likert_A <- sem(Model2_A,dat = likert_data,missing = "ML") # This Model does not converge 
+Run_Model3_Likert_A <- sem(Model3_A,dat = likert_data,missing = "ML")
+
+Run_Model0_Expanded_A <- sem(Model0_A,dat = expanded_data, missing = "ML")
+Run_Model1_Expanded_A <- sem(Model1_A,dat = expanded_data, missing = "ML")
+Run_Model2_Expanded_A <- sem(Model2_A,dat = expanded_data, missing = "ML") # This Model does not converge 
+Run_Model3_Expanded_A <- sem(Model3_A,dat = expanded_data, missing = "ML") 
 ```
 
-
+#### Descriptive Statistics for Model 0  
+To obtain the coefficient omega
+```{r}
+reliability(Run_Model0_Likert_A,return.total=TRUE)
+reliability(Run_Model0_Expanded_A,return.total=TRUE)
+```
+To obtain the average item mean
+```{r}
+mean(colMeans(likert_data[,c(2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57)],na.rm=TRUE))
+mean(colMeans(expanded_data[,c(2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57)],na.rm=TRUE))
+```
+To obtain the average item variance
+```{r}
+mean(sapply(likert_data[,c(2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57)], var, na.rm=TRUE))
+mean(sapply(expanded_data[,c(2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57)], var, na.rm=TRUE))
