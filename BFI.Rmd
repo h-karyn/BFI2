@@ -269,3 +269,169 @@ To obtain the average item variance
 ```{r}
 mean(sapply(likert_data[,c(2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57)], var, na.rm=TRUE))
 mean(sapply(expanded_data[,c(2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57)], var, na.rm=TRUE))
+```
+#### Model Summary
+##### Likert Format
+```{r}
+summary(Run_Model0_Likert_A, standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model1_Likert_A,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model2_Likert_A,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model3_Likert_A,standardized = TRUE,fit.measures = TRUE)
+```
+##### Expanded Format
+```{r}
+summary(Run_Model0_Expanded_A, standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model1_Expanded_A,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model2_Expanded_A,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model3_Expanded_A,standardized = TRUE,fit.measures = TRUE)
+```
+#### Model Fit indices 
+```{r}
+summary(compareFit(Run_Model0_Likert_A,Run_Model1_Likert_A,Run_Model2_Likert_A,Run_Model3_Likert_A,nested = FALSE))
+```
+
+```{r}
+summary(compareFit(Run_Model0_Expanded_A,Run_Model1_Expanded_A,Run_Model2_Expanded_A,Run_Model3_Expanded_A,nested = FALSE))
+```
+
+### Consciousness
+#### Model Syntax
+Model 0 has no method factor.
+
+```{r}
+Model0_C <- '
+Organization  =~ self_BFI_3 + self_BFI_18 + self_BFI_33 + self_BFI_48
+Productiveness  =~ self_BFI_8 + self_BFI_23 + self_BFI_38 + self_BFI_53
+Responsibility  =~ self_BFI_13 + self_BFI_28 + self_BFI_43 + self_BFI_58
+
+#Consciousness =~ Organization + Productiveness + Responsibility
+'
+```
+Model 1 has an Acquiescence factor to capture the residuals variance of all items. 
+```{r}
+Model1_C <- '
+Organization  =~ self_BFI_3 + self_BFI_18 + self_BFI_33 + self_BFI_48
+Productiveness  =~ self_BFI_8 + self_BFI_23 + self_BFI_38 + self_BFI_53
+Responsibility  =~ self_BFI_13 + self_BFI_28 + self_BFI_43 + self_BFI_58
+
+#Consciousness =~ Organization + Productiveness + Responsibility
+
+Organization ~~ 0*Acquiescence
+Productiveness ~~ 0*Acquiescence
+Responsibility ~~ 0*Acquiescence
+
+Acquiescence =~ (-1)*self_BFI_3 + 1*self_BFI_18 + 1*self_BFI_33 + (-1)*self_BFI_48 + 
+(-1)*self_BFI_8 + (-1)*self_BFI_23 + 1*self_BFI_38 + 1*self_BFI_53 + 
+1*self_BFI_13 + (-1)*self_BFI_28 + 1*self_BFI_43 + (-1)*self_BFI_58
+'
+```
+Model 2 has a negative wording factor to capture the residuals variance of reversely worded items.
+```{r}
+Model2_C <- '
+Organization  =~ self_BFI_3 + self_BFI_18 + self_BFI_33 + self_BFI_48
+Productiveness  =~ self_BFI_8 + self_BFI_23 + self_BFI_38 + self_BFI_53
+Responsibility  =~ self_BFI_13 + self_BFI_28 + self_BFI_43 + self_BFI_58
+
+#Consciousness =~ Organization + Productiveness + Responsibility
+
+Organization ~~ 0*Reverse
+Productiveness ~~ 0*Reverse
+Responsibility ~~ 0*Reverse
+
+Reverse =~ self_BFI_3 + self_BFI_48 + self_BFI_8 + self_BFI_23  + self_BFI_28 + self_BFI_58
+'
+```
+Model 3 has a positive wording factor to capture the residuals variance of positively worded items. The alternatice syntax is used for the Expanded format to constrain the variance to be positive
+```{r}
+Model3_C <- '
+Organization  =~ self_BFI_3 + self_BFI_18 + self_BFI_33 + self_BFI_48
+Productiveness  =~ self_BFI_8 + self_BFI_23 + self_BFI_38 + self_BFI_53
+Responsibility  =~ self_BFI_13 + self_BFI_28 + self_BFI_43 + self_BFI_58
+
+#Consciousness =~ Organization + Productiveness + Responsibility
+
+Organization ~~ 0*Positive
+Productiveness ~~ 0*Positive
+Responsibility ~~ 0*Positive
+
+Positive =~ self_BFI_18 + self_BFI_33 + self_BFI_38 + self_BFI_53 + self_BFI_13 + self_BFI_43 
+'
+```
+
+#### Constructing the Models 
+```{r}
+Run_Model0_Likert_C <- sem(Model0_C,dat = likert_data, missing = "ML")
+Run_Model1_Likert_C <- sem(Model1_C,dat = likert_data, missing = "ML")
+Run_Model2_Likert_C <- sem(Model2_C,dat = likert_data,missing = "ML") 
+Run_Model3_Likert_C <- sem(Model3_C,dat = likert_data,missing = "ML")
+
+Run_Model0_Expanded_C <- sem(Model0_C,dat = expanded_data, missing = "ML")
+Run_Model1_Expanded_C <- sem(Model1_C,dat = expanded_data, missing = "ML")
+Run_Model2_Expanded_C <- sem(Model2_C,dat = expanded_data, missing = "ML") # Negative Estimate or variances
+Run_Model3_Expanded_C <- sem(Model3_C,dat = expanded_data, missing = "ML") 
+```
+
+#### Descriptive Statistics for Model 0  
+To obtain the coefficient omega
+```{r}
+reliability(Run_Model0_Likert_C,return.total=TRUE)
+reliability(Run_Model0_Expanded_C,return.total=TRUE)
+```
+To obtain the average item mean
+```{r}
+mean(colMeans(likert_data[,c(3, 8, 13, 18, 23, 28, 33, 38, 43, 48, 53, 58)],na.rm=TRUE))
+mean(colMeans(expanded_data[,c(3, 8, 13, 18, 23, 28, 33, 38, 43, 48, 53, 58)],na.rm=TRUE))
+```
+To obtain the average item variance
+```{r}
+mean(sapply(likert_data[,c(3, 8, 13, 18, 23, 28, 33, 38, 43, 48, 53, 58)], var, na.rm=TRUE))
+mean(sapply(expanded_data[,c(3, 8, 13, 18, 23, 28, 33, 38, 43, 48, 53, 58)], var, na.rm=TRUE))
+```
+
+#### Model Summary
+##### Likert Format
+```{r}
+summary(Run_Model0_Likert_C, standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model1_Likert_C,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model2_Likert_C,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model3_Likert_C,standardized = TRUE,fit.measures = TRUE)
+```
+##### Expanded Format
+```{r}
+summary(Run_Model0_Expanded_C, standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model1_Expanded_C,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model2_Expanded_C,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model3_Expanded_C,standardized = TRUE,fit.measures = TRUE)
+```
+#### Model Fit indices 
+```{r}
+summary(compareFit(Run_Model0_Likert_C,Run_Model1_Likert_C,Run_Model2_Likert_C,Run_Model3_Likert_C,nested = FALSE))
+```
+
+```{r}
+summary(compareFit(Run_Model0_Expanded_C,Run_Model1_Expanded_C,Run_Model2_Expanded_C,Run_Model3_Expanded_C,nested = FALSE))
+```
