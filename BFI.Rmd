@@ -181,7 +181,6 @@ summary(compareFit(Run_Model0_Expanded_E,Run_Model1_Expanded_E,Run_Model2_Expand
 ### Agreeableness
 #### Model Syntax
 Model 0 has no method factor.
-
 ```{r}
 Model0_A <- '
 Compassion  =~ self_BFI_2 + self_BFI_17 + self_BFI_32 + self_BFI_47
@@ -353,6 +352,24 @@ Responsibility ~~ 0*Reverse
 Reverse =~ self_BFI_3 + self_BFI_48 + self_BFI_8 + self_BFI_23  + self_BFI_28 + self_BFI_58
 '
 ```
+```{r}
+Model2_C_alternative <- '
+Organization  =~ self_BFI_3 + self_BFI_18 + self_BFI_33 + self_BFI_48
+Productiveness  =~ self_BFI_8 + self_BFI_23 + self_BFI_38 + self_BFI_53
+Responsibility  =~ self_BFI_13 + self_BFI_28 + self_BFI_43 + self_BFI_58
+
+#Consciousness =~ Organization + Productiveness + Responsibility
+
+Organization ~~ 0*Reverse
+Productiveness ~~ 0*Reverse
+Responsibility ~~ 0*Reverse
+
+self_BFI_28~~a*self_BFI_28
+a>0
+
+Reverse =~ self_BFI_3 + self_BFI_48 + self_BFI_8 + self_BFI_23  + self_BFI_28 + self_BFI_58
+'
+```
 Model 3 has a positive wording factor to capture the residuals variance of positively worded items. The alternatice syntax is used for the Expanded format to constrain the variance to be positive
 ```{r}
 Model3_C <- '
@@ -379,7 +396,7 @@ Run_Model3_Likert_C <- sem(Model3_C,dat = likert_data,missing = "ML")
 
 Run_Model0_Expanded_C <- sem(Model0_C,dat = expanded_data, missing = "ML")
 Run_Model1_Expanded_C <- sem(Model1_C,dat = expanded_data, missing = "ML")
-Run_Model2_Expanded_C <- sem(Model2_C,dat = expanded_data, missing = "ML") # Negative Estimate or variances
+Run_Model2_Expanded_C <- sem(Model2_C_alternative,dat = expanded_data, missing = "ML") # Negative Estimate or variances
 Run_Model3_Expanded_C <- sem(Model3_C,dat = expanded_data, missing = "ML") 
 ```
 
@@ -435,3 +452,268 @@ summary(compareFit(Run_Model0_Likert_C,Run_Model1_Likert_C,Run_Model2_Likert_C,R
 ```{r}
 summary(compareFit(Run_Model0_Expanded_C,Run_Model1_Expanded_C,Run_Model2_Expanded_C,Run_Model3_Expanded_C,nested = FALSE))
 ```
+
+### Negative Emotionality
+#### Model Syntax
+Model 0 has no method factor.
+```{r}
+Model0_N <- '
+Anxiety  =~ self_BFI_4 + self_BFI_19 + self_BFI_34 + self_BFI_49
+Depression  =~ self_BFI_9 + self_BFI_24 + self_BFI_39 + self_BFI_54
+Emotional_Volatility  =~ self_BFI_14 + self_BFI_29 + self_BFI_44 + self_BFI_59
+
+#Negative_Emotionality =~ Anxiety + Depression + Emotional_Volatility
+'
+```
+Model 1 has an Acquiescence factor to capture the residuals variance of all items. 
+```{r}
+Model1_N <- '
+Anxiety  =~ self_BFI_4 + self_BFI_19 + self_BFI_34 + self_BFI_49
+Depression  =~ self_BFI_9 + self_BFI_24 + self_BFI_39 + self_BFI_54
+Emotional_Volatility  =~ self_BFI_14 + self_BFI_29 + self_BFI_44 + self_BFI_59
+
+#Negative_Emotionality =~ Anxiety + Depression + Emotional_Volatility
+
+Anxiety ~~ 0*Acquiescence
+Depression ~~ 0*Acquiescence
+Emotional_Volatility ~~ 0*Acquiescence
+
+Acquiescence =~ (-1)*self_BFI_4 + 1*self_BFI_19 + 1*self_BFI_34 + (-1)*self_BFI_49 +
+(-1)*self_BFI_9 + (-1)*self_BFI_24 + 1*self_BFI_39 + 1*self_BFI_54 + 
+1*self_BFI_14 + (-1)*self_BFI_29 + (-1)*self_BFI_44 + 1*self_BFI_59
+'
+```
+Model 2 has a negative wording factor to capture the residuals variance of reversely worded items.
+```{r}
+Model2_N <- '
+Anxiety  =~ self_BFI_4 + self_BFI_19 + self_BFI_34 + self_BFI_49
+Depression  =~ self_BFI_9 + self_BFI_24 + self_BFI_39 + self_BFI_54
+Emotional_Volatility  =~ self_BFI_14 + self_BFI_29 + self_BFI_44 + self_BFI_59
+
+#Negative_Emotionality =~ Anxiety + Depression + Emotional_Volatility
+
+Anxiety ~~ 0*Reverse
+Depression ~~ 0*Reverse
+Emotional_Volatility ~~ 0*Reverse
+
+Reverse =~ self_BFI_4  + self_BFI_49 + self_BFI_9 + self_BFI_24 +self_BFI_29 + self_BFI_44 
+'
+```
+Model 3 has a positive wording factor to capture the residuals variance of positively worded items. The alternatice syntax is used for the Expanded format to constrain the variance to be positive
+```{r}
+Model3_N <- '
+Anxiety  =~ self_BFI_4 + self_BFI_19 + self_BFI_34 + self_BFI_49
+Depression  =~ self_BFI_9 + self_BFI_24 + self_BFI_39 + self_BFI_54
+Emotional_Volatility  =~ self_BFI_14 + self_BFI_29 + self_BFI_44 + self_BFI_59
+
+#Negative_Emotionality =~ Anxiety + Depression + Emotional_Volatility
+
+Anxiety ~~ 0*Positive
+Depression ~~ 0*Positive
+Emotional_Volatility ~~ 0*Positive
+
+Positive =~ self_BFI_19 + self_BFI_34 + self_BFI_39 + self_BFI_54 + self_BFI_14 + self_BFI_59
+'
+```
+
+#### Constructing the Models 
+```{r}
+Run_Model0_Likert_N <- sem(Model0_N,dat = likert_data, missing = "ML")
+Run_Model1_Likert_N <- sem(Model1_N,dat = likert_data, missing = "ML")
+Run_Model2_Likert_N <- sem(Model2_N,dat = likert_data,missing = "ML") 
+Run_Model3_Likert_N <- sem(Model3_N,dat = likert_data,missing = "ML")
+
+Run_Model0_Expanded_N <- sem(Model0_N,dat = expanded_data, missing = "ML")
+Run_Model1_Expanded_N <- sem(Model1_N,dat = expanded_data, missing = "ML")
+Run_Model2_Expanded_N <- sem(Model2_N,dat = expanded_data, missing = "ML") 
+Run_Model3_Expanded_N <- sem(Model3_N,dat = expanded_data, missing = "ML") # No solution is found 
+```
+
+#### Descriptive Statistics for Model 0  
+To obtain the coefficient omega
+```{r}
+reliability(Run_Model0_Likert_N,return.total=TRUE)
+reliability(Run_Model0_Expanded_N,return.total=TRUE)
+```
+To obtain the average item mean
+```{r}
+
+mean(colMeans(likert_data[,c(4, 19, 34, 49, 9, 24, 39, 54, 14, 29, 44, 59)],na.rm=TRUE))
+mean(colMeans(expanded_data[,c(4, 19, 34, 49, 9, 24, 39, 54, 14, 29, 44, 59)],na.rm=TRUE))
+```
+To obtain the average item variance
+```{r}
+mean(sapply(likert_data[,c(4, 19, 34, 49, 9, 24, 39, 54, 14, 29, 44, 59)], var, na.rm=TRUE))
+mean(sapply(expanded_data[,c(4, 19, 34, 49, 9, 24, 39, 54, 14, 29, 44, 59)], var, na.rm=TRUE))
+```
+
+#### Model Summary
+##### Likert Format
+```{r}
+summary(Run_Model0_Likert_N, standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model1_Likert_N,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model2_Likert_N,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model3_Likert_N,standardized = TRUE,fit.measures = TRUE)
+```
+##### Expanded Format
+```{r}
+summary(Run_Model0_Expanded_N, standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model1_Expanded_N,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model2_Expanded_N,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model3_Expanded_N,standardized = TRUE,fit.measures = TRUE)
+```
+#### Model Fit indices 
+```{r}
+summary(compareFit(Run_Model0_Likert_N,Run_Model1_Likert_N,Run_Model2_Likert_N,Run_Model3_Likert_N,nested = FALSE))
+```
+
+```{r}
+summary(compareFit(Run_Model0_Expanded_N,Run_Model1_Expanded_N,Run_Model2_Expanded_N,Run_Model3_Expanded_N,nested = FALSE))
+```
+
+
+### Open-Mindedness: items 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60
+#### Model Syntax
+Model 0 has no method factor.
+```{r}
+Model0_O <- '
+Aesthetic_Sensitivity  =~ self_BFI_5 + self_BFI_20 + self_BFI_35 + self_BFI_50
+Intellectual_Curiosity=~ self_BFI_10 + self_BFI_25 + self_BFI_40 + self_BFI_55
+Creative_Imagination  =~ self_BFI_15 + self_BFI_30 + self_BFI_45 + self_BFI_60
+
+#Negative_Emotionality =~ Intellectual_Curiosity + Aesthetic_Sensitivity + Creative_Imagination
+'
+```
+Model 1 has an Acquiescence factor to capture the residuals variance of all items. 
+```{r}
+Model1_O <- '
+Aesthetic_Sensitivity  =~ self_BFI_5 + self_BFI_20 + self_BFI_35 + self_BFI_50
+Intellectual_Curiosity=~ self_BFI_10 + self_BFI_25 + self_BFI_40 + self_BFI_55
+Creative_Imagination  =~ self_BFI_15 + self_BFI_30 + self_BFI_45 + self_BFI_60
+
+#Negative_Emotionality =~ Intellectual_Curiosity + Aesthetic_Sensitivity + Creative_Imagination
+
+Intellectual_Curiosity ~~ 0*Acquiescence
+Aesthetic_Sensitivity ~~ 0*Acquiescence
+Creative_Imagination ~~ 0*Acquiescence
+
+Acquiescence =~ (-1)*self_BFI_5 + 1*self_BFI_20 + 1*self_BFI_35 + (-1)*self_BFI_50 + 
+1*self_BFI_10 + (-1)*self_BFI_25 + 1*self_BFI_40 + (-1)*self_BFI_55 + 
+1*self_BFI_15 + (-1)*self_BFI_30 + (-1)*self_BFI_45 + 1*self_BFI_60
+
+'
+```
+
+
+Model 2 has a negative wording factor to capture the residuals variance of reversely worded items.
+```{r}
+Model2_O <- '
+Aesthetic_Sensitivity  =~ self_BFI_5 + self_BFI_20 + self_BFI_35 + self_BFI_50
+Intellectual_Curiosity=~ self_BFI_10 + self_BFI_25 + self_BFI_40 + self_BFI_55
+Creative_Imagination  =~ self_BFI_15 + self_BFI_30 + self_BFI_45 + self_BFI_60
+
+#Negative_Emotionality =~ Intellectual_Curiosity + Aesthetic_Sensitivity + Creative_Imagination
+
+Intellectual_Curiosity ~~ 0*Reverse
+Aesthetic_Sensitivity ~~ 0*Reverse
+Creative_Imagination ~~ 0*Reverse
+
+Reverse =~ self_BFI_5  + self_BFI_50 + self_BFI_25 + self_BFI_55 +self_BFI_30+ self_BFI_45 
+'
+```
+Model 3 has a positive wording factor to capture the residuals variance of positively worded items. The alternatice syntax is used for the Expanded format to constrain the variance to be positive
+```{r}
+Model3_O <- '
+Aesthetic_Sensitivity  =~ self_BFI_5 + self_BFI_20 + self_BFI_35 + self_BFI_50
+Intellectual_Curiosity=~ self_BFI_10 + self_BFI_25 + self_BFI_40 + self_BFI_55
+Creative_Imagination  =~ self_BFI_15 + self_BFI_30 + self_BFI_45 + self_BFI_60
+
+#Negative_Emotionality =~ Intellectual_Curiosity + Aesthetic_Sensitivity + Creative_Imagination
+
+Intellectual_Curiosity ~~ 0*Positive
+Aesthetic_Sensitivity ~~ 0*Positive
+Creative_Imagination ~~ 0*Positive
+
+Positive =~ self_BFI_20 + self_BFI_35 + self_BFI_10 + self_BFI_40 + self_BFI_15 + self_BFI_60
+'
+```
+
+#### Constructing the Models 
+```{r}
+Run_Model0_Likert_O <- sem(Model0_O,dat = likert_data, missing = "ML")
+Run_Model1_Likert_O <- sem(Model1_O,dat = likert_data, missing = "ML") 
+Run_Model2_Likert_O <- sem(Model2_O,dat = likert_data,missing = "ML") 
+Run_Model3_Likert_O <- sem(Model3_O,dat = likert_data,missing = "ML") # No solution is found 
+
+Run_Model0_Expanded_O <- sem(Model0_O,dat = expanded_data, missing = "ML")
+Run_Model1_Expanded_O <- sem(Model1_O,dat = expanded_data, missing = "ML") 
+Run_Model2_Expanded_O <- sem(Model2_O,dat = expanded_data, missing = "ML") 
+Run_Model3_Expanded_O <- sem(Model3_O,dat = expanded_data, missing = "ML") # No solution is found 
+```
+
+#### Descriptive Statistics for Model 0  
+To obtain the coefficient omega
+```{r}
+reliability(Run_Model0_Likert_O,return.total=TRUE)
+reliability(Run_Model0_Expanded_O,return.total=TRUE)
+```
+To obtain the average item mean
+```{r}
+mean(colMeans(likert_data[,c(5, 10, 15, 20, 25, 30, 35,40, 45, 50, 55, 60)],na.rm=TRUE))
+mean(colMeans(expanded_data[,c(5, 10, 15, 20, 25, 30, 35,40, 45, 50, 55, 60)],na.rm=TRUE))
+```
+To obtain the average item variance
+```{r}
+mean(sapply(likert_data[,c(5, 10, 15, 20, 25, 30, 35,40, 45, 50, 55, 60)], var, na.rm=TRUE))
+mean(sapply(expanded_data[,c(5, 10, 15, 20, 25, 30, 35,40, 45, 50, 55, 60)], var, na.rm=TRUE))
+```
+
+#### Model Summary
+##### Likert Format
+```{r}
+summary(Run_Model0_Likert_O, standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model1_Likert_O,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model2_Likert_O,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model3_Likert_O,standardized = TRUE,fit.measures = TRUE)
+```
+##### Expanded Format
+```{r}
+summary(Run_Model0_Expanded_O, standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model1_Expanded_O,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model2_Expanded_O,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model3_Expanded_O,standardized = TRUE,fit.measures = TRUE)
+```
+#### Model Fit indices 
+```{r}
+summary(compareFit(Run_Model0_Likert_O,Run_Model1_Likert_O,Run_Model2_Likert_O,Run_Model3_Likert_O,nested = FALSE))
+```
+
+```{r}
+summary(compareFit(Run_Model0_Expanded_O,Run_Model1_Expanded_O,Run_Model2_Expanded_O,Run_Model3_Expanded_O,nested = FALSE))
+```
+
+

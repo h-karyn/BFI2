@@ -9,7 +9,7 @@ library(semTools)
 # Agreeableness: items 2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57
 # Consciousness: items 3, 8, 13, 18, 23, 28, 33, 38, 43, 48, 53, 58
 # Negative Emotionality: items 4, 9, 14, 19, 24, 29, 34, 39, 44, 49, 54, 59
-# Open-Mindedness: items 5, 10, 15, 20, 25, 30, 35,40, 45, 50, 55
+# Open-Mindedness: items 5, 10, 15, 20, 25, 30, 35,40, 45, 50, 55, 60
 
 # Sociability: 1, 16R, 31R, 46
 # Assertiveness: 6, 21, 36R, 51R
@@ -28,8 +28,8 @@ library(semTools)
 # Depression: 9R, 24R, 39, 54
 # Emotional Volatility: 14, 29R, 44R, 59
 
-# Intellectual Curiosity: 10, 25R, 40, 55R
 # Aesthetic Sensitivity: 5R, 20, 35, 50R
+# Intellectual Curiosity: 10, 25R, 40, 55R
 # Creative Imagination: 15, 30R, 45R, 60 
 
 # D_1 Sex: Male  (1), Female  (2), Gender Variant  (3) 
