@@ -3,6 +3,8 @@ title: "BFI"
 author: "Karyn Huang"
 date: "1/25/2022"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -584,7 +586,7 @@ summary(compareFit(Run_Model0_Expanded_N,Run_Model1_Expanded_N,Run_Model2_Expand
 ```
 
 
-### Open-Mindedness: items 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60
+### Open-Mindedness
 #### Model Syntax
 Model 0 has no method factor.
 ```{r}
@@ -612,10 +614,8 @@ Creative_Imagination ~~ 0*Acquiescence
 Acquiescence =~ (-1)*self_BFI_5 + 1*self_BFI_20 + 1*self_BFI_35 + (-1)*self_BFI_50 + 
 1*self_BFI_10 + (-1)*self_BFI_25 + 1*self_BFI_40 + (-1)*self_BFI_55 + 
 1*self_BFI_15 + (-1)*self_BFI_30 + (-1)*self_BFI_45 + 1*self_BFI_60
-
 '
 ```
-
 
 Model 2 has a negative wording factor to capture the residuals variance of reversely worded items.
 ```{r}
@@ -633,6 +633,7 @@ Creative_Imagination ~~ 0*Reverse
 Reverse =~ self_BFI_5  + self_BFI_50 + self_BFI_25 + self_BFI_55 +self_BFI_30+ self_BFI_45 
 '
 ```
+
 Model 3 has a positive wording factor to capture the residuals variance of positively worded items. The alternatice syntax is used for the Expanded format to constrain the variance to be positive
 ```{r}
 Model3_O <- '
@@ -715,5 +716,24 @@ summary(compareFit(Run_Model0_Likert_O,Run_Model1_Likert_O,Run_Model2_Likert_O,R
 ```{r}
 summary(compareFit(Run_Model0_Expanded_O,Run_Model1_Expanded_O,Run_Model2_Expanded_O,Run_Model3_Expanded_O,nested = FALSE))
 ```
+
+## Difference Test 
+### likert  
+```{r}
+summary(compareFit(Run_Model0_Likert_E,Run_Model1_Likert_E))
+summary(compareFit(Run_Model0_Likert_A,Run_Model1_Likert_A))
+summary(compareFit(Run_Model0_Likert_C,Run_Model1_Likert_C))
+summary(compareFit(Run_Model0_Likert_N,Run_Model1_Likert_N))
+summary(compareFit(Run_Model0_Likert_O,Run_Model1_Likert_O))
+```
+### Expanded 
+```{r}
+summary(compareFit(Run_Model0_Expanded_E,Run_Model1_Expanded_E))
+summary(compareFit(Run_Model0_Expanded_A,Run_Model1_Expanded_A))
+summary(compareFit(Run_Model0_Expanded_C,Run_Model1_Expanded_C))
+summary(compareFit(Run_Model0_Expanded_N,Run_Model1_Expanded_N))
+summary(compareFit(Run_Model0_Expanded_O,Run_Model1_Expanded_O))
+```
+
 
 
