@@ -25,7 +25,9 @@ data <- bfi.cleaned.data.participant.v1[,c(1:61,122:129)]
 
 # filter data basing on condition 
 likert_data <- subset(data, data$self_condition == "O") #“O” refers to the Original Likert version
-expanded_data <- subset(data, data$self_condition == "E") #“E” refers to the Expanded version 
+expanded_data <- subset(data, data$self_condition == "E") #“E” refers to the Expanded version
+itemSpec_data <- subset(data, data$self_condition == "IS")  #“O” refers to the Item Specific version
+interrogative_data <- subset(data, data$self_condition == "I") #“I” refers to the Interrogative version
 ```
 
 
@@ -95,7 +97,7 @@ Positive =~ self_BFI_1 + self_BFI_46 + self_BFI_6 + self_BFI_21 + self_BFI_41 + 
 
 # The Expanded data do not fit Model 3. To converge the mode, we restricted the residual 
 # of item 56 to positive 
-Model3_E_alternative <- '
+Model3_E_alternative_for_expanded <- '
 Sociability  =~ self_BFI_1 + self_BFI_16 + self_BFI_31 + self_BFI_46
 Assertiveness  =~ self_BFI_6 + self_BFI_21 + self_BFI_36 + self_BFI_51
 Energy_Level  =~ self_BFI_11 + self_BFI_26 + self_BFI_41 + self_BFI_56
@@ -111,6 +113,26 @@ a>0
 
 Positive =~ self_BFI_1 + self_BFI_46 + self_BFI_6 + self_BFI_21 + self_BFI_41 + self_BFI_56
 '
+
+# The Expanded data do not fit Model 3. To converge the mode, we restricted the residual 
+# of item 56 to positive 
+Model3_E_alternative_for_itemSpec <- '
+Sociability  =~ self_BFI_1 + self_BFI_16 + self_BFI_31 + self_BFI_46
+Assertiveness  =~ self_BFI_6 + self_BFI_21 + self_BFI_36 + self_BFI_51
+Energy_Level  =~ self_BFI_11 + self_BFI_26 + self_BFI_41 + self_BFI_56
+
+#Extroversion =~ Sociability + Assertiveness + Energy_Level
+
+Sociability ~~ 0*Positive
+Energy_Level ~~ 0*Positive
+Assertiveness ~~ 0*Positive
+
+self_BFI_21~~ a* self_BFI_21
+a>0
+
+Positive =~ self_BFI_1 + self_BFI_46 + self_BFI_6 + self_BFI_21 + self_BFI_41 + self_BFI_56
+'
+```
 ```
 #### Constructing the Models 
 ```{r}
@@ -122,7 +144,17 @@ Run_Model3_Likert_E <- sem(Model3_E,dat = likert_data,missing = "ML")
 Run_Model0_Expanded_E <- sem(Model0_E,dat = expanded_data, missing = "ML")
 Run_Model1_Expanded_E <- sem(Model1_E,dat = expanded_data, missing = "ML")
 Run_Model2_Expanded_E <- sem(Model2_E,dat = expanded_data, missing = "ML")
-Run_Model3_Expanded_E <- sem(Model3_E_alternative,dat = expanded_data, missing = "ML") # the modified Model 3
+Run_Model3_Expanded_E <- sem(Model3_E_alternative_for_expanded,dat = expanded_data, missing = "ML") # the modified Model 3
+
+Run_Model0_ItemSpec_E <- sem(Model0_E,dat = itemSpec_data, missing = "ML")
+Run_Model1_ItemSpec_E <- sem(Model1_E,dat = itemSpec_data, missing = "ML") # Negative Estimate or variances
+Run_Model2_ItemSpec_E <- sem(Model2_E,dat = itemSpec_data,missing = "ML") # No solution is found 
+Run_Model3_ItemSpec_E <- sem(Model3_E_alternative_for_itemSpec,dat = itemSpec_data,missing = "ML") # the modified model 3 
+
+Run_Model0_Interrogative_E <- sem(Model0_E,dat = interrogative_data, missing = "ML")
+Run_Model1_Interrogative_E <- sem(Model1_E,dat = interrogative_data, missing = "ML") # Negative Estimate or variances
+Run_Model2_Interrogative_E <- sem(Model2_E,dat = interrogative_data,missing = "ML")
+Run_Model3_Interrogative_E <- sem(Model3_E,dat = interrogative_data,missing = "ML") # No solution is found 
 ```
 
 #### Descriptive Statistics for Model 0  
@@ -130,16 +162,22 @@ To obtain the coefficient omega
 ```{r}
 reliability(Run_Model0_Likert_E,return.total=TRUE)
 reliability(Run_Model0_Expanded_E,return.total=TRUE)
+reliability(Run_Model0_ItemSpec_E,return.total=TRUE)
+reliability(Run_Model0_Interrogative_E,return.total=TRUE)
 ```
 To obtain the average item mean
 ```{r}
 mean(colMeans(likert_data[,c(1 , 16 , 31 , 46, 6 , 21 , 36 , 51, 11 , 26 , 41 , 56)],na.rm=TRUE))
 mean(colMeans(expanded_data[,c(1 , 16 , 31 , 46, 6 , 21 , 36 , 51, 11 , 26 , 41 , 56)],na.rm=TRUE))
+mean(colMeans(itemSpec_data[,c(1 , 16 , 31 , 46, 6 , 21 , 36 , 51, 11 , 26 , 41 , 56)],na.rm=TRUE))
+mean(colMeans(interrogative_data[,c(1 , 16 , 31 , 46, 6 , 21 , 36 , 51, 11 , 26 , 41 , 56)],na.rm=TRUE))
 ```
 To obtain the average item variance
 ```{r}
 mean(sapply(likert_data[,c(1 , 16 , 31 , 46, 6 , 21 , 36 , 51, 11 , 26 , 41 , 56)], var, na.rm=TRUE))
 mean(sapply(expanded_data[,c(1 , 16 , 31 , 46, 6 , 21 , 36 , 51, 11 , 26 , 41 , 56)], var, na.rm=TRUE))
+mean(sapply(itemSpec_data[,c(1 , 16 , 31 , 46, 6 , 21 , 36 , 51, 11 , 26 , 41 , 56)],var,na.rm=TRUE))
+mean(sapply(interrogative_data[,c(1 , 16 , 31 , 46, 6 , 21 , 36 , 51, 11 , 26 , 41 , 56)],var,na.rm=TRUE))
 ```
 
 #### Model Summary
@@ -169,6 +207,32 @@ summary(Run_Model2_Expanded_E,standardized = TRUE,fit.measures = TRUE)
 ```{r}
 summary(Run_Model3_Expanded_E,standardized = TRUE,fit.measures = TRUE)
 ```
+##### Item Specific Format 
+```{r}
+summary(Run_Model0_ItemSpec_E, standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model1_ItemSpec_E,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model2_ItemSpec_E,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model3_ItemSpec_E,standardized = TRUE,fit.measures = TRUE)
+```
+##### Interrogative Format 
+```{r}
+summary(Run_Model0_Interrogative_E, standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model1_Interrogative_E,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model2_Interrogative_E,standardized = TRUE,fit.measures = TRUE)
+```
+```{r}
+summary(Run_Model3_Interrogative_E,standardized = TRUE,fit.measures = TRUE)
+```
 
 #### Model Fit indices 
 ```{r}
@@ -179,6 +243,13 @@ summary(compareFit(Run_Model0_Likert_E,Run_Model1_Likert_E,Run_Model2_Likert_E,R
 summary(compareFit(Run_Model0_Expanded_E,Run_Model1_Expanded_E,Run_Model2_Expanded_E,Run_Model3_Expanded_E,nested = FALSE))
 ```
 
+```{r}
+summary(compareFit(Run_Model0_Interrogative_E,Run_Model1_Interrogative_E,Run_Model2_Interrogative_E,Run_Model3_Interrogative_E,nested = FALSE))
+```
+
+```{r}
+summary(compareFit(Run_Model0_ItemSpec_E,Run_Model1_ItemSpec_E,Run_Model2_ItemSpec_E,Run_Model3_ItemSpec_E,nested = FALSE))
+```
 
 ### Agreeableness
 #### Model Syntax
